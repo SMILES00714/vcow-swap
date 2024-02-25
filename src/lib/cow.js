@@ -1,7 +1,6 @@
 const BASE = "https://api.cow.fi/mainnet/api";
 
 async function post(path, body) {
-  console.log(body);
   const url = `${BASE}/${path}`;
   const response = await fetch(url, {
     method: "POST",

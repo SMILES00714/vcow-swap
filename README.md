@@ -6,11 +6,17 @@ other tokens, without temporarily holding COW.
 **:warning: This repository contains untested and unaudited code. USE AT YOUR
 OWN RISK! :warning:**
 
+## Disclaimer
+
+The tools in this repository were created for personal use. Please make sure you
+understand exactly what they do before using them yourself!
+
 ## Usage
 
-Unfortunately, this script is currently **very** bare-bones, and requires
+Unfortunately, the scripts are currently **very** bare-bones, and requires
 running things on the command line. That being said, it was designed so that no
-private keys are needed, and the Safe{Wallet} interface is used for everything.
+private keys or configuration are needed, and the Safe{Wallet} interface is used
+for everything.
 
 ### Step 1
 
@@ -19,6 +25,13 @@ the expected COW allowance.
 
 ```sh
 make hook AMOUNT=42.1337
+```
+
+For the _extra special_ situation where the Safe (`0xbeaf...`) with the vCOW
+vesting is a 1:1 Safe controlled by another Safe (`0x5afe...`):
+
+```sh
+make hook-nested AMOUNT=42.1337 SAFE=0x5afe5afE5afE5afE5afE5aFe5aFe5Afe5Afe5AfE DAUGTHER=0xbeAfbeafbEAFBeAFbeAFBEafBEAFbeaFBEAfbeaF
 ```
 
 This will generate a file in `out/hook-$(date).json` that contains a
@@ -46,8 +59,10 @@ Safe{Wallet} interface, only for signing typed data from Safe apps. Luckily, I
 have a Safe app for signing user specified typed data:
 [`nlordell/safe-message-app`](https://github.com/nlordell/safe-message-app).
 
-Note that currently, the price is chosen using a quote from the CoW Swap API. If
-you want different behaviour, then you need to modify `src/message.js`.
+Note that currently, the price is chosen using a quote from the CoW Swap API
+with generous slippage tolerance (5%). In my personal experience, CoW Swap will
+give you market price for your swaps, even if you set high slippage tolerances.
+If you want different behaviour, then you need to modify `src/typed-data.js`.
 
 ### Step 3
 
@@ -59,12 +74,3 @@ make order ORDERUID=0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefde
 ```
 
 The script will output a link to the order in the CoW Swap explorer.
-
-## Disclaimer
-
-The tools in this repository were created for personal use. Please make sure you
-understand exactly what they do before using them yourself!
-
-If you would like to support this repository, don't. Instead send the money to a
-charity of your choice, as there are a lot more poeple in a lot more need than
-myself.

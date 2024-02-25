@@ -14,7 +14,12 @@ async function post(method, params) {
       id: 0x5afe,
     }),
   });
-  const { result } = await response.json();
+
+  const { result, error } = await response.json();
+  if (error) {
+    throw new Error(error.message);
+  }
+
   return result;
 }
 

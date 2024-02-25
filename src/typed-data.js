@@ -1,7 +1,8 @@
+import { addresses, interfaces } from "./lib/contracts.js";
 import { postQuote } from "./lib/cow.js";
 import { ethers } from "./lib/ethers.js";
 import { estimateGas } from "./lib/ethrpc.js";
-import { getSafe, getTransactions, SAFE_INTERFACE } from "./lib/safe.js";
+import { getSafe, getTransactions } from "./lib/safe.js";
 import { check } from "./lib/utils.js";
 
 const [SAFE, TOKEN] = Deno.args;
@@ -13,25 +14,20 @@ const { nonce } = await getSafe(safe);
 const { results: [transaction] } = await getTransactions(safe, { nonce });
 check(transaction, "no transaction found");
 check(
-  transaction.to === "0x40A2aCCbd92BCA938b02010E17A5b8929b49130D",
-  "not a multi send",
-);
-
-const [swap] = transaction.dataDecoded.parameters[0].valueDecoded;
-check(
-  swap.to === "0xD057B63f5E69CF1B929b356b579Cba08D7688048" &&
-    swap.dataDecoded.method === "swap",
-  "not a vCOW swap hook",
-);
-const { value: amount } = swap.dataDecoded.parameters[0];
-check(
   transaction.confirmationsRequired <= transaction.confirmations.length,
   "hook missing signatures",
 );
+check(transaction.to === addresses.MultiSend, "hook not a multi send");
+const approval = transaction.dataDecoded.parameters[0].valueDecoded[1];
+check(
+  approval.to === addresses.Cow && approval.dataDecoded.method === "approve",
+  "hook missing approval",
+);
+const amount = approval.dataDecoded.parameters[1].value;
 
 const hook = {
   target: safe,
-  callData: SAFE_INTERFACE.encodeFunctionData("execTransaction", [
+  callData: interfaces.Safe.encodeFunctionData("execTransaction", [
     transaction.to,
     transaction.value,
     transaction.data,
@@ -70,7 +66,7 @@ const appData = {
   },
 };
 const order = {
-  sellToken: "0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB",
+  sellToken: addresses.Cow,
   buyToken: token,
   receiver: safe,
   feeAmount: "0",
@@ -119,7 +115,7 @@ const typedData = {
     name: "Gnosis Protocol",
     version: "v2",
     chainId: "1",
-    verifyingContract: "0x9008D19f58AAbD9eD0D60971565AA8510560ab41",
+    verifyingContract: addresses.Settlement,
   },
   message: {
     ...order,

@@ -1,3 +1,4 @@
+import { addresses } from "./lib/contracts.js";
 import { ethers } from "./lib/ethers.js";
 
 const [AMOUNT] = Deno.args;
@@ -10,7 +11,7 @@ const hook = {
   meta: {},
   transactions: [
     {
-      to: "0xD057B63f5E69CF1B929b356b579Cba08D7688048",
+      to: addresses.VCow,
       value: "0",
       data: null,
       contractMethod: {
@@ -29,7 +30,7 @@ const hook = {
       },
     },
     {
-      to: "0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB",
+      to: addresses.Cow,
       value: "0",
       data: null,
       contractMethod: {
@@ -49,7 +50,7 @@ const hook = {
         payable: false,
       },
       contractInputsValues: {
-        spender: "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110",
+        spender: addresses.VaultRelayer,
         amount,
       },
     },
